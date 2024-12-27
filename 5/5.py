@@ -13,6 +13,15 @@ with open(updates_file, 'r') as file:
         update = update.strip()
         updates.append([int(x) for x in update.split(',')])
 
+rules_dict = {}
+
+def parse_rule(rule):
+    if rule[0] not in rules_dict:
+        rules_dict[rule[0]] = {"after":[],"before":[]}
+    if rule[1] not in rules_dict:
+        rules_dict[rule[1]] = {"after":[],"before":[]}
+    rules_dict[rule[0]]["before"].append(rule[1])
+    rules_dict[rule[1]]["after"].append(rule[0])
 
 def check_updates(update):
     for rule in rules:
@@ -27,20 +36,31 @@ def sum_middle_pages(updates):
         result += update[(len(update)// 2 )]
     return result
 
+
 def fix_update(update):
-    for rule in rules:
+    # print(update)
+    fixed_update = []
+    while len(update) > 0:
         for page in update:
-            index = update.index(page)
-            if page == rule[1] and rule[0] in update[index:]:
-                print("Moving {page} because of {rule}")
+            if not set(rules_dict[page]["after"]).intersection(update):
+                fixed_update.append(page)
+                update.remove(page)
+    # print(fixed_update)
+    return fixed_update
 
-correct_updates = []
+# correct_updates = []
+# for update in updates:
+#    if check_updates(update):
+#         correct_updates.append(update)
+
+for rule in rules:
+    parse_rule(rule)
+
+fixed_updates = []
 for update in updates:
-   if check_updates(update):
-        correct_updates.append(update)
-
-result = sum_middle_pages(correct_updates)
+    if not check_updates(update):
+        fixed_updates.append(fix_update(update))
+print(sum_middle_pages(fixed_updates))
 
 # print(correct_updates)
-print(result)
 
