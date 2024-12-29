@@ -58,4 +58,3 @@ def count_x_mas(grid):
     return count
 
 print(count_x_mas(file_data))
-        
